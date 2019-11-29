@@ -26,14 +26,16 @@ const PRODUCTION = process.env.NODE_ENV === 'production';
  * @returns {import('express')} Express instance
  */
 module.exports = (
-  { storageDir, tmpDir, maxUploadSize, pictureQuality, maxPicturePixels, maxUrlCacheItems, maxAge } = {
+  { storageDir, tmpDir, maxUploadSize, pictureQuality, maxPicturePixels, maxUrlCacheItems, maxAge , useImgMagick ,onUpload } = {
     storageDir: './storage',
     tmpDir: PRODUCTION ? require('os').tmpdir : './temp',
     maxUploadSize: 1024 * 1024 * 20, // 20 megabytes
     pictureQuality: 85, // 85%
     maxPicturePixels: 1920 * 1080, // FullHD ~ 2 megapixels
     maxUrlCacheEntries: 10000000, // one million items
-    maxAge: PRODUCTION ? '365 days' : 0 // one year for production, none for development
+    maxAge: PRODUCTION ? '365 days' : 0, // one year for production, none for development
+    useImgMagick: true,
+    onUpload: (req, res, next, result) => { res.send(result);}
   }
 ) => {
   const app = express();
@@ -45,7 +47,9 @@ module.exports = (
       tmpDir,
       maxUploadSize,
       pictureQuality,
-      maxPicturePixels
+      maxPicturePixels,
+      useImgMagick,
+      onUpload
     })
   );
   app.use(
